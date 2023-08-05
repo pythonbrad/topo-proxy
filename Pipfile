@@ -7,6 +7,7 @@ name = "pypi"
 bs4 = "*"
 requests = "*"
 lxml = "*"
+flask = "*"
 
 [dev-packages]
 flake8 = "*"
@@ -15,7 +16,7 @@ flake8 = "*"
 python_version = "3.9"
 
 [scripts]
-forward_proxy = "python3 -m tests.forward_proxy"
-reverse_proxy = "python3 -m tests.reverse_proxy"
-facebook_client_proxy = "python3 -m tests.facebook_forward_proxy"
-facebook_server_proxy = "python3 -m tests.facebook_reverse_proxy"
+forward_proxy = "python3 -m examples.forward_proxy"
+reverse_proxy = "python3 -m examples.reverse_proxy"
+facebook_client_proxy = "python3 -m examples.facebook_forward_proxy"
+facebook_server_proxy = "python3 -m examples.facebook_reverse_proxy"

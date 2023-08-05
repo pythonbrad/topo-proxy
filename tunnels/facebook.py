@@ -4,6 +4,7 @@ import time
 import base64
 import re
 import os
+import logging
 
 
 class FacebookAPI:
@@ -43,6 +44,7 @@ class FacebookAPI:
         self._friend_id = None
         self._last_request_time = time.time()
         self.delay = 2  # 2s
+        self._logger = logging.getLogger(f'{__name__}(FB-API)')
 
     def is_login(self):
         return bool(self._session.cookies.get('c_user', None))
@@ -65,7 +67,7 @@ class FacebookAPI:
         return resp
 
     def login(self, email: str, password: str):
-        print('[FB-API] Athentification...')
+        self._logger.debug('Athentification...')
         resp = self._request(self._host)
         form = self._get_bs(resp.text).find(id="login_form").find_all('input')
         form = {
@@ -103,7 +105,7 @@ class FacebookAPI:
             raise Exception('Friend required')
 
     def read(self, page: str = None):
-        print('[FB-API] Reading messages...')
+        self._logger.debug('Reading messages...')
         self._check()
 
         if not page:
@@ -125,7 +127,7 @@ class FacebookAPI:
         return {'messages': msg, 'prev_page': page}
 
     def send(self, msg):
-        print('[FB-API] Sending message...')
+        self._logger.debug('Sending message...')
         self._check()
 
         resp = self._request(
@@ -154,8 +156,9 @@ class FacebookProxy:
             for i in data
             if re.match(r'^\[.*?\]$', i)
         ]
-
-        print('[FB-PROXY] Initialization...')
+        
+        self._logger = logging.getLogger(f'{__name__}(FB-PROXY)')
+        self._logger.debug('Initialization...')
 
         # Connection
         self._fb_api = FacebookAPI()
@@ -168,7 +171,7 @@ class FacebookProxy:
             raise Exception('Proxy mode unknow')
 
     def _wait(self, token: str):
-        print(f'[FB-PROXY] Waiting for token: {token}...')
+        self._logger.debug(f'Waiting for token: {token}...')
 
         while 1:
             data = self._fb_api.read()['messages']
@@ -180,7 +183,7 @@ class FacebookProxy:
             time.sleep(self._delay)
 
     def connect(self, addr=None):
-        print('[FB-PROXY] Initialize connection with the server...')
+        self._logger.debug('Initialize connection with the server...')
         self._forwarder = True
 
         self._fb_api.send('[CONNECT]')
@@ -188,7 +191,7 @@ class FacebookProxy:
         self._wait(r'EOF-2')
 
     def accept(self):
-        print('[FB-PROXY] Initialize connection with the client...')
+        self._logger.debug('Initialize connection with the client...')
         self._forwarder = False
 
         self._wait(r'CONNECT')
@@ -214,10 +217,10 @@ class FacebookProxy:
 
         while data:
             chunk = data[:self._chunk_size]
-            print(f'[FB-PROXY] Sending of {len(chunk)}o...')
+            self._logger.debug(f'Sending of {len(chunk)}o...')
             self._fb_api.send('[%s]' % chunk)
             data = data[self._chunk_size:]
-            print(f'[FB-PROXY] {len(data)}o remaining...')
+            self._logger.debug(f'{len(data)}o remaining...')
 
         return size
 

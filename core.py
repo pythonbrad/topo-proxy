@@ -1,5 +1,6 @@
 import socket
 import re
+import logging
 
 
 class Tunnel:
@@ -23,6 +24,7 @@ class Tunnel:
         self._timeout = 60.0  # 60s
         self._proxy = proxy
         self._chunk_size = 8192  # 8ko
+        self._logger = logging.getLogger(__name__)
 
     def settimeout(self, timeout: float):
         self._timeout = timeout
@@ -47,7 +49,7 @@ class Tunnel:
         tx.settimeout(self._timeout)
         rx.settimeout(self._timeout)
 
-        print(f"[TUNNEL] New connection income: {client_info}.")
+        self._logger.debug(f"New connection income: {client_info}.")
 
         # Forward
         while 1:
@@ -76,14 +78,14 @@ class Tunnel:
                 )
                 data = re.sub(rb'\w*://.*?/', b'/', data)
 
-                print(f"[TUNNEL] Connection to {remote_addr}...")
+                self._logger.debug(f"Connection to {remote_addr}...")
                 try:
                     tx.connect(remote_addr)
                 except ConnectionError as err:
-                    print(f'[TUNNEL] {err}')
+                    self._logger.debug(f'{err}')
                     return
 
-            print(f"[TUNNEL] Forwarding of {len(data)}o...")
+            self._logger.debug(f"Forwarding of {len(data)}o...")
             tx.send(data)
 
         # Reverse
@@ -101,20 +103,20 @@ class Tunnel:
                 break
             # Maybe the host not respond
             except OSError as err:
-                print(f'[TUNNEL] {err}')
+                self._logger.debug(f'{err}')
                 break
 
             if not data:
                 break
 
-            print(f"[TUNNEL] Reversing of {len(data)}o...")
+            self._logger.debug(f"Reversing of {len(data)}o...")
             rx.send(data)
 
-        print("[TUNNEL] Closing of the connection...")
+        self._logger.debug("Closing of the connection...")
         tx.close()
         rx.close()
 
     def close(self):
-        print("[TUNNEL] Closing of the tunnel...")
+        self._logger.debug("Closing of the tunnel...")
         self._proxy.close()
         self._sock.close()
