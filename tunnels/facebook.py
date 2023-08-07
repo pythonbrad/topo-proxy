@@ -146,7 +146,7 @@ class FacebookAPI:
 
 class FacebookProxy:
 
-    def __init__(self):
+    def __init__(self, fb_username, fb_password):
         self._chunk_size = 15000  # 15ko
         self._delay = 2  # 2s
         self._forwarder = None
@@ -162,7 +162,7 @@ class FacebookProxy:
 
         # Connection
         self._fb_api = FacebookAPI()
-        self._fb_api.login(os.getenv('FB_USERNAME'), os.getenv('FB_PASSWORD'))
+        self._fb_api.login(fb_username, fb_password)
         self._fb_api.set_friend(
             os.getenv('FB_FRIEND', self._fb_api._friend_id))
 
