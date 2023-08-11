@@ -11,7 +11,7 @@ Topo Proxy is a project who consist to offer free internet access in creating a 
 Installation
 ===
 
-Depedencies
+Dependencies
 ---
 
 - In using pip
@@ -36,8 +36,9 @@ TODO
 
 Usage
 ---
-TODO
-
+```py
+pipenv run python topo_proxy -h
+```
 
 How it work!
 ===
