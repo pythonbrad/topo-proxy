@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 import time
 import base64
 import re
-import os
 import logging
 
 
@@ -89,6 +88,8 @@ class FacebookAPI:
 
         self._friend_id = None
 
+        return self._user_id
+
     def set_friend(self, friend_id: str):
 
         if friend_id == self._session.cookies.get('c_user'):
@@ -146,7 +147,7 @@ class FacebookAPI:
 
 class FacebookProxy:
 
-    def __init__(self, fb_username, fb_password):
+    def __init__(self, fb_username, fb_password, fb_friend_id):
         self._chunk_size = 15000  # 15ko
         self._delay = 2  # 2s
         self._forwarder = None
@@ -156,15 +157,14 @@ class FacebookProxy:
             for i in data
             if re.match(r'^\[.*?\]$', i)
         ]
-        
+
         self._logger = logging.getLogger(f'{__name__}(FB-PROXY)')
         self._logger.debug('Initialization...')
 
         # Connection
         self._fb_api = FacebookAPI()
         self._fb_api.login(fb_username, fb_password)
-        self._fb_api.set_friend(
-            os.getenv('FB_FRIEND', self._fb_api._friend_id))
+        self._fb_api.set_friend(fb_friend_id)
 
     def _check(self):
         if self._forwarder is None:
@@ -255,7 +255,7 @@ class FacebookProxy:
         buffer = re.split(r'EOF-[12]|CLOSE', buffer)[-2]
 
         return b''.join([
-            # "==" is for both case 
+            # "==" is for both case
             base64.b64decode(buf+'==')
             for buf in buffer.split('=')]
         )

@@ -10,7 +10,9 @@ logging.config.fileConfig(fname='log.conf', disable_existing_loggers=False)
 # Get the logger specified in the file
 logger = logging.getLogger(__name__)
 
-proxy = FacebookProxy(os.getenv('FB_USERNAME'), os.getenv('FB_PASSWORD'))
+proxy = FacebookProxy(
+    os.getenv('FB_USERNAME'), os.getenv('FB_PASSWORD'),
+    os.getenv('FB_FRIEND'))
 
 tunnel = Tunnel(proxy)
 # We maximize the sending of data

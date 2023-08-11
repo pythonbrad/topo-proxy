@@ -21,7 +21,7 @@ class Tunnel:
 
     def __init__(self, proxy):
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._timeout = 60 # 60s
+        self._timeout = 60  # 60s
         self._proxy = proxy
         self._chunk_size = 8192  # 8ko
         self._logger = logging.getLogger(__name__)

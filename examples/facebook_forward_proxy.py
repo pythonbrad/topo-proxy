@@ -12,7 +12,9 @@ logger = logging.getLogger(__name__)
 
 local_addr = ('0.0.0.0', 8001)
 
-proxy = FacebookProxy(os.getenv('FB_USERNAME'), os.getenv('FB_PASSWORD'))
+proxy = FacebookProxy(
+    os.getenv('FB_USERNAME'), os.getenv('FB_PASSWORD'),
+    os.getenv('FB_FRIEND'))
 
 tunnel = Tunnel(proxy)
 tunnel.bind(local_addr)
